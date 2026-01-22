@@ -9,6 +9,13 @@ CREATE TABLE banks (
   name VARCHAR(120) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
+CREATE TABLE users (
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(64) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('admin','operator') NOT NULL
+) ENGINE=InnoDB;
+
 CREATE TABLE atms (
   atm_id INT AUTO_INCREMENT PRIMARY KEY,
   bank_id INT NOT NULL,
@@ -187,3 +194,7 @@ INSERT INTO withdrawals (atm_id, card_id, account_id, amount, commission_amount,
   (3, 1, 1, 2000.00, 0.00, 2000.00, NOW()),
   (2, 3, 3, 1000.00, 0.00, 1000.00, NOW()),
   (4, 4, 4, 7000.00, 0.00, 7000.00, NOW());
+
+INSERT INTO users (username, password_hash, role) VALUES
+  ('admin', '$2y$12$EQHqpEjLeSggi4SJmUBRS.PJV8YZE/GUWRUdwnICCTXFT6drAGIrG', 'admin'),
+  ('operator', '$2y$12$aAFRjfxbgskCWrE1eid.DufbQdII8urUkOE8Df297OjxmTWawRyHK', 'operator');
