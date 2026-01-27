@@ -19,14 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
 
-            // Блокируем строку счета, чтобы второй запрос ожидал освобождения блокировки.
+            // DEMO: без блокировки — отсутствие SELECT ... FOR UPDATE может привести к гонкам и некорректным списаниям.
             $stmt = $pdo->prepare(
                 'SELECT a.account_id, a.balance, c.issuing_bank_id, atm.bank_id AS atm_bank_id
                  FROM accounts a
                  JOIN cards c ON c.account_id = a.account_id
                  JOIN atms atm ON atm.atm_id = ?
-                 WHERE c.card_id = ?
-                 FOR UPDATE'
+                 WHERE c.card_id = ?'
             );
             $stmt->execute([$atmId, $cardId]);
             $row = $stmt->fetch();
@@ -53,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $successData = [
                     'commission' => $commission,
                     'total' => $total,
-                    'message' => 'Операция выполнена (С БЛОКИРОВКОЙ).',
+                    'message' => 'Операция выполнена (БЕЗ БЛОКИРОВКИ — DEMO).',
                 ];
             }
         } catch (Throwable $e) {
@@ -109,8 +108,8 @@ require_once __DIR__ . '/includes/header.php';
             Сумма
             <input type="number" name="amount" min="1" step="0.01" required>
         </label>
-        <button class="button" type="submit">Снять</button>
-        <button class="button" type="submit" formaction="withdraw_unlocked.php">Снять (без блокировки)</button>
+        <button class="button" type="submit" formaction="withdraw.php">Снять</button>
+        <button class="button" type="submit">Снять (без блокировки)</button>
     </form>
     <p class="muted">Демо: кнопка без блокировки может приводить к некорректным списаниям при одновременных запросах.</p>
 
